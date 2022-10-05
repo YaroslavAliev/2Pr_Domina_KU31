@@ -1,73 +1,104 @@
-#include<stdio.h>
-#include<time.h>
-#include<stdlib.h>
-#include<math.h>
+ #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <math.h>
 
-void create_arr(double* array, int size){
-  srand(time(NULL));
-  for(int i = 0;i < size;i++){
-    array[i] = (double)(rand() % 101 + (-50)) + (double)(rand() % 100)/100; 
-  }
-}
+double* generateArray(int length, double min, double max);
+void printArray(double * array, int length);
+double calculateArithmeticalMean(double* array, int length);
+int findCountOfNumbersBiggerThanNumber(double* array, int length, double number);
+int findIndexOfFirstNegative(double* array, int length);
+double absSumOfArrayElements(double* array, int length, int startIndex);
 
-double average(double* array, int size){
-  double sum = 0.0;
-  for(int i = 0;i < size;i++){
-    sum += array[i];
-  }
-  return sum/size;
-}
+int main() {
+    int arrayLength = 10;
+    srand(time(NULL));
 
-void print_arr(double* array, int size){
-  for(int i = 0;i < size;i++){
-    printf("arr[%d] = %0.2lf \n", i, array[i]);
-  }
-}
+    double* array = generateArray(arrayLength, -10, 10);
+    printArray(array, arrayLength);
 
-int count_moreSum(double* array, int size){
-  double sum_num = average(array, size);
-  int count = 0;
-  for(int i = 0;i < size; i++){
-    if(array[i] > sum_num)
-      count++;
-  }
-  return count;
-}
+    // Arithmetical mean of array
+    double arithmeticalMeanOfArray = calculateArithmeticalMean(array, arrayLength);
+    int countOfElementsBiggerThanArithmeticalMean = findCountOfNumbersBiggerThanNumber(array, arrayLength, arithmeticalMeanOfArray);
 
-double sum_after_minus(double* array, int size){
-  int flag = 0;
-  int indx = -1;
-  double sum = 0;
-  for(int i = 0;i < size; i++){
-    if(array[i] < 0){
-      flag = 1;
-      indx = i+1;
-      break;
+    printf("Arithmetical mean is %lf\n", arithmeticalMeanOfArray);
+    printf("Count of elements bigger than arithmetical mean is %d\n\n", countOfElementsBiggerThanArithmeticalMean);
+
+    int indexOfFirstNegativeElement = findIndexOfFirstNegative(array, arrayLength);
+
+    if (indexOfFirstNegativeElement != -1) {
+        double absSumOfElements = absSumOfArrayElements(array, arrayLength, indexOfFirstNegativeElement);
+        printf("Sum of elements after first negative number is %lf\n", absSumOfElements);
+    } else {
+        printf("Sum of elements after first negative number is 0\n");
     }
-  }
-  if(flag != 0 && indx < size)
-    for(indx; indx < size;indx++)
-      sum+= fabs(array[indx]);
-  return sum;
+
+    return 0;
 }
 
+double* generateArray(int length, double min, double max) {
+    double * array = (double*)malloc(sizeof(double) * length);
 
-int main(){
-int n = 0;
-printf("Enter size arr: ");
-scanf("%d", &n);
-if(n <= 0){
-printf("size must be more zero!!!");
-  return 0;
+    int index;
+
+    for (index = 0 ; index < length ; index++) {
+        array[index] = (double)rand() * (max - min) / (double)RAND_MAX + min;
+    }
+
+    return array;
 }
-double* arr = (double*)malloc(sizeof(double) * n);
 
-create_arr(arr, n);
-print_arr(arr, n);
-printf("average = %0.2lf\n", average(arr, n));
-printf("%d numbers more average\n", count_moreSum(arr,n));
-printf("sum elements after first nagative = %0.2lf\n", sum_after_minus(arr, n)); 
+void printArray(double* array, int length) {
+    int index;
+    for (index = 0; index < length; index++) {
+        printf("%.2lf ", array[index]);
+    }
+    printf("\n");
+}
 
-free(arr);
-return 0;
+double calculateArithmeticalMean(double* array, int length) {
+    int index;
+    double sumOfNumbers = 0;
+
+    for (index = 0; index < length; index++) {
+        sumOfNumbers += array[index];
+    }
+
+    return sumOfNumbers / length;
+}
+
+int findCountOfNumbersBiggerThanNumber(double* array, int length, double number) {
+    int index;
+    int countOfElements = 0;
+
+    for (index = 0; index < length; index++) {
+        if (array[index] > number) {
+            countOfElements++;
+        }
+    }
+
+    return countOfElements;
+}
+
+int findIndexOfFirstNegative(double* array, int length) {
+    int index;
+
+    for (index = 0; index < length; index++) {
+        if (array[index] < 0) {
+            return index;
+        }
+    }
+
+    return -1;
+}
+
+double absSumOfArrayElements(double* array, int length, int startIndex) {
+    int index;
+    double sumOfElements = 0;
+
+    for (index = startIndex; index < length ; index++) {
+        sumOfElements += fabs(array[index]);
+    }
+
+    return sumOfElements;
 }
